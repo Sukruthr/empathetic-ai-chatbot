@@ -588,6 +588,9 @@ Respond naturally as a supportive friend (without using their name more than onc
         return []
 
 # Create the Gradio interface
+import gradio as gr
+import os
+
 def create_gradio_interface():
     # Initialize the chatbot with default models
     emotion_model_id = os.environ.get("EMOTION_MODEL_ID", "suku9/emotion-classifier")
@@ -595,51 +598,53 @@ def create_gradio_interface():
     
     chatbot = GradioEmotionChatbot(emotion_model_id, response_model_id)
     
-    # Create the Gradio interface with dark mode styling
+    # Create the Gradio interface with theme-agnostic styling
     custom_css = """
-    /* Dark mode styling */
+    /* Neutral styling for light/dark mode compatibility */
     body {
-        background-color: #1a1a1a !important;
-        color: #e0e0e0 !important;
+        color: #333333; /* Dark gray for text, works in both modes */
     }
     
     .gradio-container {
-        max-width: 750px !important;
+        max-width: 1200px !important; /* Wide container for horizontal layout */
         margin: auto !important;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
         border-radius: 12px !important;
-        background: #2d2d2d !important;
-        padding: 15px !important;
+        background: #f5f5f5; /* Light gray background, neutral */
+        padding: 20px !important;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Subtle shadow for depth */
     }
 
     /* Chatbot header styling */
     .gradio-container h1, #header {
-        color: #a29bfe !important;
+        color: #6b46c1 !important; /* Vibrant purple, good contrast */
         text-align: center !important;
-        font-size: 1.8rem !important;
-        margin-bottom: 5px !important;
-        font-weight: 600 !important;
+        font-size: 2.2rem !important;
+        margin-bottom: 8px !important;
+        font-weight: 700 !important;
+        text-shadow: 0 0 2px rgba(0,0,0,0.2) !important; /* Subtle shadow */
     }
 
     .gradio-container p, #subheader {
         text-align: center !important;
-        color: #b0b0b0 !important;
-        margin-bottom: 15px !important;
-        font-size: 0.9rem !important;
+        color: #666666 !important; /* Medium gray for subtitle */
+        margin-bottom: 20px !important;
+        font-size: 1.1rem !important;
+        font-weight: 400 !important;
     }
 
     /* Chatbot window styling */
     #chatbot {
-        height: 380px !important;
+        height: 450px !important;
         overflow: auto !important;
         border-radius: 10px !important;
-        background-color: #1a1a1a !important;
-        border: 1px solid #3d3d3d !important;
-        padding: 10px !important;
-        margin-bottom: 15px !important;
+        background-color: #ffffff !important; /* White background for chat */
+        border: 1px solid #d0d0d0 !important; /* Light border */
+        padding: 15px !important;
+        margin-bottom: 20px !important;
     }
     
-    /* Force horizontal text orientation for ALL elements */
+    /* Force horizontal text orientation */
     * {
         writing-mode: horizontal-tb !important;
         text-orientation: mixed !important;
@@ -649,48 +654,47 @@ def create_gradio_interface():
     /* Message styling */
     .message {
         border-radius: 12px !important;
-        padding: 8px 12px !important;
-        margin: 5px 0 !important;
-        max-width: 85% !important;
-        width: 250px !important;
+        padding: 10px 15px !important;
+        margin: 8px 10px !important; /* Added margin for spacing */
+        max-width: 75% !important; /* Same width for both user and bot */
+        width: auto !important;
         word-break: break-word !important;
-        writing-mode: horizontal-tb !important;
-        text-orientation: mixed !important;
-        direction: ltr !important;
+        font-size: 1rem !important;
+        line-height: 1.4 !important;
+        text-shadow: 0 0 1px rgba(0,0,0,0.2) !important; /* Subtle shadow */
     }
     
     .user-message {
-        background-color: #4a5568 !important;
-        color: #e2e8f0 !important;
-        writing-mode: horizontal-tb !important;
-        text-orientation: mixed !important;
+        background-color: #e6e6fa !important; /* Light lavender for user */
+        color: #333333 !important; /* Dark text for contrast */
+        margin-left: auto !important; /* Align right */
     }
     
     .bot-message {
-        background-color: #553c9a !important;
-        color: #f8f9fa !important;
-        writing-mode: horizontal-tb !important;
-        text-orientation: mixed !important;
+        background-color: #6b46c1 !important; /* Purple for bot */
+        color: #ffffff !important; /* White text for contrast */
+        margin-right: auto !important; /* Align left */
     }
 
-    /* User input styling - FIX FOR VERTICAL TEXT */
+    /* User input styling */
     #user-input, .gradio-container textarea, .gradio-container input[type="text"] {
-        background-color: #2d2d2d !important;
-        color: #e0e0e0 !important;
+        background-color: #ffffff !important;
+        color: #333333 !important;
         border-radius: 20px !important;
-        padding: 10px 15px !important;
-        border: 1px solid #3d3d3d !important;
-        margin-bottom: 10px !important;
+        padding: 12px 18px !important;
+        border: 1px solid #d0d0d0 !important;
+        margin-bottom: 15px !important;
         writing-mode: horizontal-tb !important;
         text-orientation: mixed !important;
         direction: ltr !important;
         width: 100% !important;
-        min-height: 45px !important;
+        min-height: 50px !important;
         height: auto !important;
         resize: none !important;
+        font-size: 1rem !important;
     }
     
-    /* Force text orientation for any text inputs */
+    /* Force text orientation for inputs */
     .cm-editor, .cm-scroller, .cm-content, .cm-line {
         writing-mode: horizontal-tb !important;
         text-orientation: mixed !important;
@@ -699,6 +703,7 @@ def create_gradio_interface():
     /* Ensure row is horizontal */
     .gradio-row {
         flex-direction: row !important;
+        gap: 10px !important;
     }
 
     /* Fix for chat bubbles */
@@ -707,35 +712,35 @@ def create_gradio_interface():
         text-orientation: mixed !important;
     }
 
-    /* Apply horizontal text to all text elements in chatbot */
+    /* Apply horizontal text to all text elements */
     .prose, .prose p, .prose span, .text-input-with-enter {
         writing-mode: horizontal-tb !important;
         text-orientation: mixed !important;
         direction: ltr !important;
     }
     
-    /* Target the specific user bubble on the right side */
+    /* Target user bubble */
     .gradio-chatbot > div > div {
         writing-mode: horizontal-tb !important;
         text-orientation: mixed !important;
         direction: ltr !important;
     }
 
-    /* Target any text inside chatbot bubbles */
+    /* Target text inside chatbot bubbles */
     .gradio-chatbot * {
         writing-mode: horizontal-tb !important;
         text-orientation: mixed !important;
         direction: ltr !important;
     }
 
-    /* AVATAR AND USERNAME FIXES */
+    /* Avatar fixes */
     .avatar, .avatar-container, .avatar-image, .user-avatar, .bot-avatar {
         writing-mode: horizontal-tb !important;
         text-orientation: mixed !important;
         direction: ltr !important;
     }
 
-    /* Fix for specific containers that might be causing issues */
+    /* Fix for specific containers */
     [class*="message"], [class*="bubble"], [class*="avatar"], [class*="chat"] {
         writing-mode: horizontal-tb !important;
         text-orientation: mixed !important;
@@ -744,27 +749,28 @@ def create_gradio_interface():
 
     /* Button styling */
     .send-btn, .clear-btn {
-        background-color: #6c5ce7 !important;
-        color: white !important;
+        background-color: #6b46c1 !important; /* Purple button */
+        color: #ffffff !important;
         border: none !important;
         border-radius: 20px !important;
-        padding: 8px 16px !important;
+        padding: 10px 20px !important;
         font-weight: 600 !important;
         cursor: pointer !important;
         transition: all 0.3s ease !important;
+        font-size: 1rem !important;
     }
 
     .send-btn:hover, .clear-btn:hover {
-        background-color: #5649c1 !important;
+        background-color: #553c9a !important; /* Darker purple on hover */
         transform: translateY(-1px) !important;
     }
 
     .clear-btn {
-        background-color: #e74c3c !important;
+        background-color: #e53e3e !important; /* Red for clear button */
     }
 
     .clear-btn:hover {
-        background-color: #c0392b !important;
+        background-color: #c53030 !important; /* Darker red on hover */
     }
 
     /* Hide footer */
@@ -772,15 +778,15 @@ def create_gradio_interface():
         display: none !important;
     }
     
-    /* Fix scrollbar */
+    /* Scrollbar styling */
     ::-webkit-scrollbar {
-        width: 6px;
-        background-color: #1a1a1a;
+        width: 8px;
+        background-color: #f5f5f5;
     }
     
     ::-webkit-scrollbar-thumb {
-        background-color: #4a4a4a;
-        border-radius: 3px;
+        background-color: #b0b0b0;
+        border-radius: 4px;
     }
     """
     
@@ -788,39 +794,39 @@ def create_gradio_interface():
         gr.Markdown("# EmotionChat", elem_id="header")
         gr.Markdown("A supportive chatbot that understands how you feel", elem_id="subheader")
         
-        # Chat interface with improved styling
+        # Chat interface
         chatbot_interface = gr.Chatbot(
             elem_id="chatbot",
             show_label=False,
-            height=380,
+            height=450,
             avatar_images=["https://em-content.zobj.net/source/microsoft-teams/363/bust-in-silhouette_1f464.png", 
                            "https://em-content.zobj.net/source/microsoft-teams/363/robot_1f916.png"],
         )
         
-        # Input and button row with better styling
+        # Input and button row
         with gr.Row():
             user_input = gr.Textbox(
                 placeholder="Type your message here...",
                 show_label=False,
                 container=False,
-                scale=9,
+                scale=8,
                 elem_id="user-input",
                 lines=1,
                 max_lines=1,
                 rtl=False
             )
-            submit_btn = gr.Button("Send", scale=1, elem_classes="send-btn")
+            submit_btn = gr.Button("Send", scale=2, elem_classes="send-btn")
         
         # New conversation button
         clear_btn = gr.Button("New Conversation", elem_classes="clear-btn")
         
-        # Set up the event handlers
+        # Event handlers
         submit_btn.click(
             chatbot.process_message,
             inputs=[user_input, chatbot_interface],
             outputs=[chatbot_interface],
         ).then(
-            lambda: "",  # Clear the input box after sending
+            lambda: "",  # Clear input box
             None,
             [user_input],
         )
@@ -830,7 +836,7 @@ def create_gradio_interface():
             inputs=[user_input, chatbot_interface],
             outputs=[chatbot_interface],
         ).then(
-            lambda: "",  # Clear the input box after sending
+            lambda: "",  # Clear input box
             None,
             [user_input],
         )
